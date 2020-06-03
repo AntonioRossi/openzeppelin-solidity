@@ -1,8 +1,9 @@
-pragma solidity ^0.5.2;
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.6.0;
 
 /**
- * @title Math
- * @dev Assorted math operations
+ * @dev Standard math utilities missing in the Solidity language.
  */
 library Math {
     /**
@@ -20,9 +21,8 @@ library Math {
     }
 
     /**
-     * @dev Calculates the average of two numbers. Since these are integers,
-     * averages of an even and odd number cannot be represented, and will be
-     * rounded down.
+     * @dev Returns the average of two numbers. The result is rounded towards
+     * zero.
      */
     function average(uint256 a, uint256 b) internal pure returns (uint256) {
         // (a + b) / 2 can overflow, so we distribute

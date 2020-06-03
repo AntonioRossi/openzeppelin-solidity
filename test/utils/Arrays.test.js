@@ -1,8 +1,11 @@
-require('openzeppelin-test-helpers');
+const { contract } = require('@openzeppelin/test-environment');
+require('@openzeppelin/test-helpers');
 
-const ArraysImpl = artifacts.require('ArraysImpl');
+const { expect } = require('chai');
 
-contract('Arrays', function () {
+const ArraysImpl = contract.fromArtifact('ArraysImpl');
+
+describe('Arrays', function () {
   context('Even number of elements', function () {
     const EVEN_ELEMENTS_ARRAY = [11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
 
@@ -11,23 +14,23 @@ contract('Arrays', function () {
     });
 
     it('should return correct index for the basic case', async function () {
-      (await this.arrays.findUpperBound(16)).should.be.bignumber.equal('5');
+      expect(await this.arrays.findUpperBound(16)).to.be.bignumber.equal('5');
     });
 
     it('should return 0 for the first element', async function () {
-      (await this.arrays.findUpperBound(11)).should.be.bignumber.equal('0');
+      expect(await this.arrays.findUpperBound(11)).to.be.bignumber.equal('0');
     });
 
     it('should return index of the last element', async function () {
-      (await this.arrays.findUpperBound(20)).should.be.bignumber.equal('9');
+      expect(await this.arrays.findUpperBound(20)).to.be.bignumber.equal('9');
     });
 
     it('should return first index after last element if searched value is over the upper boundary', async function () {
-      (await this.arrays.findUpperBound(32)).should.be.bignumber.equal('10');
+      expect(await this.arrays.findUpperBound(32)).to.be.bignumber.equal('10');
     });
 
     it('should return 0 for the element under the lower boundary', async function () {
-      (await this.arrays.findUpperBound(2)).should.be.bignumber.equal('0');
+      expect(await this.arrays.findUpperBound(2)).to.be.bignumber.equal('0');
     });
   });
 
@@ -39,23 +42,23 @@ contract('Arrays', function () {
     });
 
     it('should return correct index for the basic case', async function () {
-      (await this.arrays.findUpperBound(16)).should.be.bignumber.equal('5');
+      expect(await this.arrays.findUpperBound(16)).to.be.bignumber.equal('5');
     });
 
     it('should return 0 for the first element', async function () {
-      (await this.arrays.findUpperBound(11)).should.be.bignumber.equal('0');
+      expect(await this.arrays.findUpperBound(11)).to.be.bignumber.equal('0');
     });
 
     it('should return index of the last element', async function () {
-      (await this.arrays.findUpperBound(21)).should.be.bignumber.equal('10');
+      expect(await this.arrays.findUpperBound(21)).to.be.bignumber.equal('10');
     });
 
     it('should return first index after last element if searched value is over the upper boundary', async function () {
-      (await this.arrays.findUpperBound(32)).should.be.bignumber.equal('11');
+      expect(await this.arrays.findUpperBound(32)).to.be.bignumber.equal('11');
     });
 
     it('should return 0 for the element under the lower boundary', async function () {
-      (await this.arrays.findUpperBound(2)).should.be.bignumber.equal('0');
+      expect(await this.arrays.findUpperBound(2)).to.be.bignumber.equal('0');
     });
   });
 
@@ -67,7 +70,7 @@ contract('Arrays', function () {
     });
 
     it('should return index of first element in next filled range', async function () {
-      (await this.arrays.findUpperBound(17)).should.be.bignumber.equal('5');
+      expect(await this.arrays.findUpperBound(17)).to.be.bignumber.equal('5');
     });
   });
 
@@ -77,7 +80,7 @@ contract('Arrays', function () {
     });
 
     it('should always return 0 for empty array', async function () {
-      (await this.arrays.findUpperBound(10)).should.be.bignumber.equal('0');
+      expect(await this.arrays.findUpperBound(10)).to.be.bignumber.equal('0');
     });
   });
 });

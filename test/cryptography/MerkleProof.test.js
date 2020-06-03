@@ -1,11 +1,15 @@
-require('openzeppelin-test-helpers');
+const { contract } = require('@openzeppelin/test-environment');
+
+require('@openzeppelin/test-helpers');
 
 const { MerkleTree } = require('../helpers/merkleTree.js');
-const { keccak256, bufferToHex } = require('ethereumjs-util');
+const { keccakFromString, bufferToHex } = require('ethereumjs-util');
 
-const MerkleProofWrapper = artifacts.require('MerkleProofWrapper');
+const { expect } = require('chai');
 
-contract('MerkleProof', function () {
+const MerkleProofWrapper = contract.fromArtifact('MerkleProofWrapper');
+
+describe('MerkleProof', function () {
   beforeEach(async function () {
     this.merkleProof = await MerkleProofWrapper.new();
   });
@@ -19,9 +23,9 @@ contract('MerkleProof', function () {
 
       const proof = merkleTree.getHexProof(elements[0]);
 
-      const leaf = bufferToHex(keccak256(elements[0]));
+      const leaf = bufferToHex(keccakFromString(elements[0]));
 
-      (await this.merkleProof.verify(proof, root, leaf)).should.equal(true);
+      expect(await this.merkleProof.verify(proof, root, leaf)).to.equal(true);
     });
 
     it('should return false for an invalid Merkle proof', async function () {
@@ -30,14 +34,14 @@ contract('MerkleProof', function () {
 
       const correctRoot = correctMerkleTree.getHexRoot();
 
-      const correctLeaf = bufferToHex(keccak256(correctElements[0]));
+      const correctLeaf = bufferToHex(keccakFromString(correctElements[0]));
 
       const badElements = ['d', 'e', 'f'];
       const badMerkleTree = new MerkleTree(badElements);
 
       const badProof = badMerkleTree.getHexProof(badElements[0]);
 
-      (await this.merkleProof.verify(badProof, correctRoot, correctLeaf)).should.equal(false);
+      expect(await this.merkleProof.verify(badProof, correctRoot, correctLeaf)).to.equal(false);
     });
 
     it('should return false for a Merkle proof of invalid length', async function () {
@@ -49,9 +53,9 @@ contract('MerkleProof', function () {
       const proof = merkleTree.getHexProof(elements[0]);
       const badProof = proof.slice(0, proof.length - 5);
 
-      const leaf = bufferToHex(keccak256(elements[0]));
+      const leaf = bufferToHex(keccakFromString(elements[0]));
 
-      (await this.merkleProof.verify(badProof, root, leaf)).should.equal(false);
+      expect(await this.merkleProof.verify(badProof, root, leaf)).to.equal(false);
     });
   });
 });

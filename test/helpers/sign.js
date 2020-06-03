@@ -1,7 +1,4 @@
-const REAL_SIGNATURE_SIZE = 2 * 65; // 65 bytes in hexadecimal string legnth
-const PADDED_SIGNATURE_SIZE = 2 * 96; // 96 bytes in hexadecimal string length
-
-const DUMMY_SIGNATURE = `0x${web3.utils.padLeft('', REAL_SIGNATURE_SIZE)}`;
+const { web3 } = require('@openzeppelin/test-environment');
 
 function toEthSignedMessageHash (messageHex) {
   const messageBuffer = Buffer.from(messageHex.substring(2), 'hex');
@@ -9,9 +6,21 @@ function toEthSignedMessageHash (messageHex) {
   return web3.utils.sha3(Buffer.concat([prefix, messageBuffer]));
 }
 
+function fixSignature (signature) {
+  // in geth its always 27/28, in ganache its 0/1. Change to 27/28 to prevent
+  // signature malleability if version is 0/1
+  // see https://github.com/ethereum/go-ethereum/blob/v1.8.23/internal/ethapi/api.go#L465
+  let v = parseInt(signature.slice(130, 132), 16);
+  if (v < 27) {
+    v += 27;
+  }
+  const vHex = v.toString(16);
+  return signature.slice(0, 130) + vHex;
+}
+
 // signs message in node (ganache auto-applies "Ethereum Signed Message" prefix)
-const signMessage = (signer, messageHex = '0x') => {
-  return web3.eth.sign(messageHex, signer);
+async function signMessage (signer, messageHex = '0x') {
+  return fixSignature(await web3.eth.sign(messageHex, signer));
 };
 
 /**
@@ -28,6 +37,10 @@ const getSignFor = (contract, signer) => (redeemer, methodName, methodArgs = [])
     contract.address,
     redeemer,
   ];
+
+  const REAL_SIGNATURE_SIZE = 2 * 65; // 65 bytes in hexadecimal string legnth
+  const PADDED_SIGNATURE_SIZE = 2 * 96; // 96 bytes in hexadecimal string length
+  const DUMMY_SIGNATURE = `0x${web3.utils.padLeft('', REAL_SIGNATURE_SIZE)}`;
 
   // if we have a method, add it to the parts that we're signing
   if (methodName) {
@@ -50,5 +63,6 @@ const getSignFor = (contract, signer) => (redeemer, methodName, methodArgs = [])
 module.exports = {
   signMessage,
   toEthSignedMessageHash,
+  fixSignature,
   getSignFor,
 };
